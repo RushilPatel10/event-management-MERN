@@ -22,9 +22,9 @@ export const NotificationProvider = ({ children }) => {
   return (
     <NotificationContext.Provider value={{ showNotification }}>
       {children}
-      {/* Notification Component */}
       <Transition
         show={!!notification}
+        as="div"
         enter="transition-opacity duration-300"
         enterFrom="opacity-0"
         enterTo="opacity-100"
@@ -32,15 +32,13 @@ export const NotificationProvider = ({ children }) => {
         leaveFrom="opacity-100"
         leaveTo="opacity-0"
       >
-        {notification && (
-          <div className="fixed bottom-4 right-4 z-50">
-            <div className={`rounded-lg p-4 ${
-              notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'
-            } text-white shadow-lg`}>
-              {notification.message}
-            </div>
+        <div className="fixed bottom-4 right-4 z-50">
+          <div className={`rounded-lg p-4 ${
+            notification?.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+          } text-white shadow-lg`}>
+            {notification?.message}
           </div>
-        )}
+        </div>
       </Transition>
     </NotificationContext.Provider>
   );

@@ -7,25 +7,36 @@ import EventCard from '../components/EventCard';
 const Profile = () => {
   const { user } = useAuth();
   const { showNotification } = useNotification();
-  const [myEvents, setMyEvents] = useState([]);
-  const [registeredEvents, setRegisteredEvents] = useState([]);
+  const [createdEvents, setCreatedEvents] = useState([]);
+  const [attendingEvents, setAttendingEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchUserEvents();
-  }, []);
+    if (user) {
+      fetchUserEvents();
+    }
+  }, [user]);
 
   const fetchUserEvents = async () => {
     try {
-      const [createdEvents, attending] = await Promise.all([
+      setLoading(true);
+      const [createdResponse, attendingResponse] = await Promise.all([
         api.get('/events/created'),
         api.get('/events/attending')
       ]);
-      setMyEvents(createdEvents.data);
-      setRegisteredEvents(attending.data);
-      setLoading(false);
+
+      console.log('Created events:', createdResponse.data);
+      console.log('Attending events:', attendingResponse.data);
+
+      setCreatedEvents(createdResponse.data);
+      setAttendingEvents(attendingResponse.data);
     } catch (error) {
-      showNotification('Failed to fetch events', 'error');
+      console.error('Error fetching events:', error);
+      showNotification(
+        error.response?.data?.message || 'Failed to fetch events',
+        'error'
+      );
+    } finally {
       setLoading(false);
     }
   };
@@ -39,44 +50,34 @@ const Profile = () => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">My Profile</h1>
       
-      <div className="mb-12">
-        <h2 className="text-2xl font-semibold mb-4">My Created Events</h2>
-        {myEvents.length > 0 ? (
+      <section className="mb-8">
+        <h2 className="text-2xl font-semibold mb-4">Events I'm Hosting</h2>
+        {createdEvents.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {myEvents.map(event => (
-              <EventCard
-                key={event._id}
-                event={event}
-                isAuthenticated={true}
-                currentUser={user?.user}
-              />
+            {createdEvents.map(event => (
+              <EventCard key={event._id} event={event} />
             ))}
           </div>
         ) : (
           <p className="text-gray-500">You haven't created any events yet.</p>
         )}
-      </div>
+      </section>
 
-      <div>
+      <section>
         <h2 className="text-2xl font-semibold mb-4">Events I'm Attending</h2>
-        {registeredEvents.length > 0 ? (
+        {attendingEvents.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {registeredEvents.map(event => (
-              <EventCard
-                key={event._id}
-                event={event}
-                isAuthenticated={true}
-                currentUser={user?.user}
-              />
+            {attendingEvents.map(event => (
+              <EventCard key={event._id} event={event} />
             ))}
           </div>
         ) : (
-          <p className="text-gray-500">You're not registered for any events.</p>
+          <p className="text-gray-500">You're not attending any events yet.</p>
         )}
-      </div>
+      </section>
     </div>
   );
 };

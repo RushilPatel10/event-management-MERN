@@ -1,41 +1,22 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true,
-    trim: true
+    required: true
   },
   email: {
     type: String,
     required: true,
-    unique: true,
-    trim: true,
-    lowercase: true
+    unique: true
   },
   password: {
     type: String,
     required: true
   },
-  eventsCreated: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Event'
-  }],
-  eventsAttending: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Event'
-  }]
+  // Add any other fields you need
 }, {
   timestamps: true
-});
-
-// Hash password before saving
-userSchema.pre('save', async function(next) {
-  if (this.isModified('password')) {
-    this.password = await bcrypt.hash(this.password, 8);
-  }
-  next();
 });
 
 module.exports = mongoose.model('User', userSchema); 

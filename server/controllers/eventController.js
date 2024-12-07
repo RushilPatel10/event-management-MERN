@@ -2,12 +2,20 @@ const Event = require('../models/Event');
 
 exports.getEvents = async (req, res) => {
   try {
+    console.log('Fetching all events');
     const events = await Event.find()
-      .populate('creator', 'name')
+      .populate('creator', 'name email')
+      .populate('attendees', 'name email')
       .sort({ date: 1 });
-    res.json(events);
+
+    console.log(`Found ${events.length} events`);
+    return res.json(events);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error in getEvents:', error);
+    return res.status(500).json({ 
+      message: 'Failed to fetch events',
+      error: error.message 
+    });
   }
 };
 
@@ -141,5 +149,57 @@ exports.cancelRSVP = async (req, res) => {
     res.json(updatedEvent);
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
+  }
+};
+
+exports.getAttendingEvents = async (req, res) => {
+  try {
+    console.log('Getting attending events for user:', req.userId);
+
+    if (!req.userId) {
+      return res.status(401).json({ message: 'User not authenticated' });
+    }
+
+    const events = await Event.find({
+      attendees: req.userId
+    })
+    .populate('creator', 'name email')
+    .populate('attendees', 'name email')
+    .sort({ date: 1 });
+
+    console.log('Found attending events:', events.length);
+    return res.json(events);
+  } catch (error) {
+    console.error('Error in getAttendingEvents:', error);
+    return res.status(500).json({ 
+      message: 'Failed to fetch attending events',
+      error: error.message 
+    });
+  }
+};
+
+exports.getCreatedEvents = async (req, res) => {
+  try {
+    console.log('Getting created events for user:', req.userId);
+
+    if (!req.userId) {
+      return res.status(401).json({ message: 'User not authenticated' });
+    }
+
+    const events = await Event.find({
+      creator: req.userId
+    })
+    .populate('creator', 'name email')
+    .populate('attendees', 'name email')
+    .sort({ date: 1 });
+
+    console.log('Found created events:', events.length);
+    return res.json(events);
+  } catch (error) {
+    console.error('Error in getCreatedEvents:', error);
+    return res.status(500).json({ 
+      message: 'Failed to fetch created events',
+      error: error.message 
+    });
   }
 }; 
