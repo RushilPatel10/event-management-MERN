@@ -8,7 +8,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/');
   };
 
   return (
@@ -16,44 +16,44 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between h-16">
           <div className="flex">
-            <Link to="/" className="flex items-center">
-              <span className="text-xl font-bold">Event Manager</span>
+            <Link to="/" className="flex-shrink-0 flex items-center">
+              <span className="text-xl font-bold text-indigo-600">EventApp</span>
             </Link>
           </div>
 
           <div className="flex items-center">
             {user ? (
               <>
-                <Link 
+                <Link
                   to="/create-event"
-                  className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900"
+                  className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
                 >
                   Create Event
                 </Link>
-                <Link 
+                <Link
                   to="/profile"
-                  className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900"
+                  className="ml-4 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
                 >
                   Profile
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="ml-4 px-4 py-2 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700"
+                  className="ml-4 px-3 py-2 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
                 >
                   Logout
                 </button>
               </>
             ) : (
               <>
-                <Link 
+                <Link
                   to="/login"
-                  className="px-4 py-2 rounded-md text-sm font-medium text-blue-600 hover:text-blue-700"
+                  className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
                 >
                   Login
                 </Link>
-                <Link 
+                <Link
                   to="/register"
-                  className="ml-4 px-4 py-2 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+                  className="ml-4 px-3 py-2 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
                 >
                   Sign Up
                 </Link>
