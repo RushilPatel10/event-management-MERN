@@ -107,6 +107,25 @@ const Home = () => {
     navigate('/create-event');
   };
 
+  const fetchEvents = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await api.get('/events', {
+        params: {
+          search: searchTerm,
+          ...filters
+        }
+      });
+      setEvents(response.data);
+    } catch (error) {
+      console.error('Error fetching events:', error);
+      setError('Failed to load events. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">

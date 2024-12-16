@@ -8,52 +8,42 @@ const auth = require('../middleware/auth'); // Import your auth middleware
 // Register endpoint
 router.post('/register', async (req, res) => {
   try {
-    console.log('Registration request body:', req.body); // Debug log
-
     const { username, email, password } = req.body;
 
     // Validate input
     if (!username || !email || !password) {
-      return res.status(400).json({ 
-        message: 'Please provide username, email and password' 
-      });
+      return res.status(400).json({ message: 'All fields are required' });
     }
 
-    // Check if user already exists
-    const existingUser = await User.findOne({ 
-      $or: [
-        { email: email.toLowerCase() }, 
-        { username: username.toLowerCase() }
-      ]
+    // Check if user exists
+    const existingUser = await User.findOne({
+      $or: [{ email }, { username }]
     });
 
     if (existingUser) {
-      return res.status(400).json({ 
-        message: existingUser.email === email.toLowerCase() 
-          ? 'Email already registered' 
-          : 'Username already taken'
+      return res.status(400).json({
+        message: 'User already exists with this email or username'
       });
     }
 
     // Create new user
+    const hashedPassword = await bcrypt.hash(password, 12);
     const user = new User({
-      username: username.toLowerCase(),
-      email: email.toLowerCase(),
-      password // Password will be hashed by the pre-save middleware
+      username,
+      email,
+      password: hashedPassword
     });
 
     await user.save();
 
-    // Generate JWT token
+    // Generate token
     const token = jwt.sign(
       { userId: user._id },
       process.env.JWT_SECRET || 'your-secret-key',
       { expiresIn: '24h' }
     );
 
-    // Send response
     res.status(201).json({
-      success: true,
       token,
       user: {
         id: user._id,
@@ -61,22 +51,9 @@ router.post('/register', async (req, res) => {
         email: user.email
       }
     });
-
   } catch (error) {
     console.error('Registration error:', error);
-    
-    // Send appropriate error message
-    if (error.name === 'ValidationError') {
-      return res.status(400).json({ 
-        message: Object.values(error.errors)
-          .map(err => err.message)
-          .join(', ')
-      });
-    }
-
-    res.status(500).json({ 
-      message: 'Error creating user. Please try again.' 
-    });
+    res.status(500).json({ message: 'Server error' });
   }
 });
 

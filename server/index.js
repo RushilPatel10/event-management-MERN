@@ -18,6 +18,11 @@ app.use('/api/events', require('./routes/events'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/notifications', require('./routes/notifications'));
 
+// Add a test route
+app.get('/', (req, res) => {
+  res.json({ message: 'API is running' });
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);

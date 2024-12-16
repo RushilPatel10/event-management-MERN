@@ -10,59 +10,11 @@ router.get('/', async (req, res) => {
     const { search, category, location, date, price } = req.query;
     const query = {};
 
-    // Search by title or description
     if (search) {
       query.$or = [
         { title: { $regex: search, $options: 'i' } },
         { description: { $regex: search, $options: 'i' } }
       ];
-    }
-
-    // Filter by category
-    if (category) {
-      query.category = category;
-    }
-
-    // Filter by location
-    if (location) {
-      query.location = location;
-    }
-
-    // Filter by date
-    if (date) {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      
-      switch (date) {
-        case 'today':
-          const tomorrow = new Date(today);
-          tomorrow.setDate(tomorrow.getDate() + 1);
-          query.date = { $gte: today, $lt: tomorrow };
-          break;
-        case 'tomorrow':
-          const tomorrowStart = new Date(today);
-          tomorrowStart.setDate(tomorrowStart.getDate() + 1);
-          const dayAfterTomorrow = new Date(today);
-          dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
-          query.date = { $gte: tomorrowStart, $lt: dayAfterTomorrow };
-          break;
-        case 'this-week':
-          const weekEnd = new Date(today);
-          weekEnd.setDate(weekEnd.getDate() + 7);
-          query.date = { $gte: today, $lt: weekEnd };
-          break;
-        case 'this-month':
-          const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-          query.date = { $gte: today, $lt: monthEnd };
-          break;
-      }
-    }
-
-    // Filter by price
-    if (price === 'free') {
-      query.price = 0;
-    } else if (price === 'paid') {
-      query.price = { $gt: 0 };
     }
 
     const events = await Event.find(query)

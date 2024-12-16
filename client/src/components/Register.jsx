@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import api from '../services/api';
 
 const Register = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
+  const [error, setError] = React.useState('');
 
   const validationSchema = Yup.object({
     username: Yup.string()
@@ -20,18 +22,16 @@ const Register = () => {
       .min(6, 'Password must be at least 6 characters')
   });
 
-  const handleSubmit = async (values, { setSubmitting, setFieldError }) => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      const result = await register(values);
-      if (result.success) {
-        navigate('/', { replace: true });
-      } else {
-        setFieldError('general', result.error);
-      }
+      setError('');
+      const response = await api.post('/auth/register', formData);
+      localStorage.setItem('token', response.data.token);
+      navigate('/');
     } catch (error) {
-      setFieldError('general', 'Registration failed. Please try again.');
-    } finally {
-      setSubmitting(false);
+      console.error('Registration error:', error);
+      setError(error.response?.data?.message || 'Registration failed. Please try again.');
     }
   };
 
@@ -64,9 +64,9 @@ const Register = () => {
         >
           {({ isSubmitting, errors, touched }) => (
             <Form className="mt-8 space-y-6">
-              {errors.general && (
+              {error && (
                 <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-4">
-                  <p className="text-red-700">{errors.general}</p>
+                  <p className="text-red-700">{error}</p>
                 </div>
               )}
               
