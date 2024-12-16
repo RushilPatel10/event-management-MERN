@@ -1,23 +1,21 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
-  const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
-    navigate('/');
   };
 
   return (
-    <nav className="bg-white shadow-lg">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex justify-between h-16">
-          <div className="flex">
-            <Link to="/" className="flex-shrink-0 flex items-center">
-              <span className="text-xl font-bold text-indigo-600">EventApp</span>
+    <nav className="bg-indigo-600">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          <div className="flex items-center">
+            <Link to="/" className="text-white font-bold text-xl">
+              Event Management
             </Link>
           </div>
 
@@ -26,19 +24,19 @@ const Navbar = () => {
               <>
                 <Link
                   to="/create-event"
-                  className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                  className="text-white hover:bg-indigo-700 px-3 py-2 rounded-md text-sm font-medium"
                 >
                   Create Event
                 </Link>
                 <Link
                   to="/profile"
-                  className="ml-4 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                  className="text-white hover:bg-indigo-700 px-3 py-2 rounded-md text-sm font-medium"
                 >
                   Profile
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="ml-4 px-3 py-2 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+                  className="text-white hover:bg-indigo-700 px-3 py-2 rounded-md text-sm font-medium"
                 >
                   Logout
                 </button>
@@ -47,15 +45,15 @@ const Navbar = () => {
               <>
                 <Link
                   to="/login"
-                  className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                  className="text-white hover:bg-indigo-700 px-3 py-2 rounded-md text-sm font-medium"
                 >
                   Login
                 </Link>
                 <Link
                   to="/register"
-                  className="ml-4 px-3 py-2 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+                  className="text-white hover:bg-indigo-700 px-3 py-2 rounded-md text-sm font-medium"
                 >
-                  Sign Up
+                  Register
                 </Link>
               </>
             )}

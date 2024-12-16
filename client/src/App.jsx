@@ -1,53 +1,16 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Home from './pages/Home';
-import Login from './components/Login';
-import Register from './components/Register';
-import CreateEvent from './pages/CreateEvent';
-import EventDetails from './pages/EventDetails';
-import Profile from './pages/Profile';
-import PrivateRoute from './components/PrivateRoute';
-import Layout from './components/Layout';
+import { BrowserRouter as Router } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
-import { NotificationProvider } from './contexts/NotificationContext';
+import Routes from './Routes';
+import Navbar from './components/Navbar';
 
 function App() {
   return (
     <Router>
       <AuthProvider>
-        <NotificationProvider>
-          <Layout>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route 
-                path="/event/:id" 
-                element={
-                  <PrivateRoute>
-                    <EventDetails />
-                  </PrivateRoute>
-                } 
-              />
-              <Route 
-                path="/create-event" 
-                element={
-                  <PrivateRoute>
-                    <CreateEvent />
-                  </PrivateRoute>
-                } 
-              />
-              <Route 
-                path="/profile" 
-                element={
-                  <PrivateRoute>
-                    <Profile />
-                  </PrivateRoute>
-                } 
-              />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </Layout>
-        </NotificationProvider>
+        <div className="min-h-screen bg-gray-100">
+          <Navbar />
+          <Routes />
+        </div>
       </AuthProvider>
     </Router>
   );

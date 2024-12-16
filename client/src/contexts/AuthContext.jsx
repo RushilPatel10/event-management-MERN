@@ -10,22 +10,20 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        checkAuth();
+        checkAuthStatus();
     }, []);
 
-    const checkAuth = async () => {
+    const checkAuthStatus = async () => {
         const token = localStorage.getItem('token');
         if (token) {
             try {
                 const response = await api.get('/auth/me');
-                setUser(response.data);
+                setUser(response.data.user);
             } catch (error) {
                 console.error('Auth check failed:', error);
                 localStorage.removeItem('token');
                 setUser(null);
             }
-        } else {
-            setUser(null);
         }
         setLoading(false);
     };
@@ -33,20 +31,25 @@ export const AuthProvider = ({ children }) => {
     const login = async (credentials) => {
         try {
             const response = await api.post('/auth/login', credentials);
-            const { token, user: userData } = response.data;
-            
-            // Set token in localStorage
-            localStorage.setItem('token', token);
-            
-            // Set token in API headers
-            api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            
-            // Update user state
-            setUser(userData);
-            
-            return response.data;
+            if (response.data.success && response.data.token) {
+                localStorage.setItem('token', response.data.token);
+                setUser(response.data.user);
+                return response.data;
+            }
         } catch (error) {
-            console.error('Login error:', error);
+            throw error;
+        }
+    };
+
+    const register = async (userData) => {
+        try {
+            const response = await api.post('/auth/register', userData);
+            if (response.data.success && response.data.token) {
+                localStorage.setItem('token', response.data.token);
+                setUser(response.data.user);
+                return response.data;
+            }
+        } catch (error) {
             throw error;
         }
     };
@@ -54,29 +57,18 @@ export const AuthProvider = ({ children }) => {
     const logout = () => {
         localStorage.removeItem('token');
         setUser(null);
-        localStorage.clear();
-        delete api.defaults.headers.common['Authorization'];
-    };
-
-    const register = async (userData) => {
-        const response = await api.post('/auth/register', userData);
-        localStorage.setItem('token', response.data.token);
-        setUser(response.data.user);
-        return response.data;
-    };
-
-    const value = {
-        user,
-        loading,
-        login,
-        logout,
-        register,
-        checkAuth
     };
 
     return (
-        <AuthContext.Provider value={value}>
-            {!loading && children}
+        <AuthContext.Provider value={{ 
+            user, 
+            loading, 
+            login, 
+            register, 
+            logout,
+            checkAuthStatus 
+        }}>
+            {children}
         </AuthContext.Provider>
     );
 }; 

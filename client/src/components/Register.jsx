@@ -2,10 +2,11 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import api from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
 
 const Register = () => {
   const navigate = useNavigate();
+  const { register } = useAuth();
 
   const initialValues = {
     username: '',
@@ -25,6 +26,18 @@ const Register = () => {
       .min(6, 'Password must be at least 6 characters')
   });
 
+  const handleSubmit = async (values, { setSubmitting, setStatus }) => {
+    try {
+      await register(values);
+      navigate('/');
+    } catch (error) {
+      console.error('Registration error details:', error);
+      setStatus(error.message || 'Registration failed. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
@@ -37,18 +50,7 @@ const Register = () => {
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
-          onSubmit={async (values, { setSubmitting, setStatus }) => {
-            try {
-              const response = await api.post('/auth/register', values);
-              localStorage.setItem('token', response.data.token);
-              navigate('/');
-            } catch (error) {
-              console.error('Registration error:', error);
-              setStatus(error.response?.data?.message || 'Registration failed');
-            } finally {
-              setSubmitting(false);
-            }
-          }}
+          onSubmit={handleSubmit}
         >
           {({ isSubmitting, status }) => (
             <Form className="mt-8 space-y-6">

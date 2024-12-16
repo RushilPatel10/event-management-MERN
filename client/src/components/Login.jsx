@@ -1,10 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import api from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const initialValues = {
     email: '',
@@ -21,15 +22,8 @@ const Login = () => {
 
   const handleSubmit = async (values, { setSubmitting, setStatus }) => {
     try {
-      console.log('Attempting login with:', values);
-      const response = await api.post('/auth/login', values);
-      
-      if (response.data.success && response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        navigate('/');
-      } else {
-        setStatus('Login failed: Invalid response from server');
-      }
+      await login(values);
+      navigate('/');
     } catch (error) {
       console.error('Login error details:', error);
       setStatus(error.message || 'Login failed. Please try again.');
