@@ -8,7 +8,7 @@
     "test-server": "node test-server.js",
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "build": "cd ../client && npm install && npm run build",
+    "build": "echo 'No build step needed for backend'",
     "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm run build"
   },
   "keywords": [],

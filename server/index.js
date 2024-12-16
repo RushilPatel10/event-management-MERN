@@ -6,7 +6,10 @@ require('dotenv').config();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: ['https://event-management-mern-frontend.onrender.com', 'http://localhost:5173'],
+  credentials: true
+}));
 app.use(express.json());
 
 // Routes
