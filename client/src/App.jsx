@@ -1,6 +1,6 @@
 import { BrowserRouter as Router } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
-import Routes from './Routes';
+import AppRoutes from './routes/index';
 import Navbar from './components/Navbar';
 
 function App() {
@@ -9,7 +9,7 @@ function App() {
       <AuthProvider>
         <div className="min-h-screen bg-gray-100">
           <Navbar />
-          <Routes />
+          <AppRoutes />
         </div>
       </AuthProvider>
     </Router>
