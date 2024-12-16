@@ -8,11 +8,14 @@ const auth = require('../middleware/auth'); // Import your auth middleware
 // Register endpoint
 router.post('/register', async (req, res) => {
   try {
+    console.log('Register request body:', req.body); // Debug log
+
     const { username, email, password } = req.body;
 
-    // Validate input
     if (!username || !email || !password) {
-      return res.status(400).json({ message: 'All fields are required' });
+      return res.status(400).json({
+        message: 'All fields are required'
+      });
     }
 
     // Check if user exists
@@ -26,8 +29,10 @@ router.post('/register', async (req, res) => {
       });
     }
 
-    // Create new user
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 12);
+
+    // Create new user
     const user = new User({
       username,
       email,
@@ -53,25 +58,39 @@ router.post('/register', async (req, res) => {
     });
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ 
+      message: error.message || 'Error creating user'
+    });
   }
 });
 
 // Login
 router.post('/login', async (req, res) => {
   try {
+    console.log('Login request body:', req.body); // Debug log
+
     const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        message: 'Email and password are required'
+      });
+    }
 
     // Find user
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(400).json({ 
+        message: 'Invalid email or password' 
+      });
     }
 
     // Check password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(400).json({ 
+        message: 'Invalid email or password' 
+      });
     }
 
     // Generate token
@@ -91,7 +110,9 @@ router.post('/login', async (req, res) => {
     });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ 
+      message: error.message || 'Server error' 
+    });
   }
 });
 
