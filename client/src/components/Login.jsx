@@ -21,20 +21,14 @@ const Login = () => {
 
   const handleSubmit = async (values, { setSubmitting, setStatus }) => {
     try {
-      console.log('Attempting login with:', values); // Debug log
+      console.log('Attempting login with:', values);
+      const response = await api.post('/auth/login', values);
       
-      const response = await api.post('/auth/login', {
-        email: values.email,
-        password: values.password
-      });
-
-      console.log('Login response:', response.data); // Debug log
-
-      if (response.data.token) {
+      if (response.data.success && response.data.token) {
         localStorage.setItem('token', response.data.token);
         navigate('/');
       } else {
-        setStatus('Login failed: No token received');
+        setStatus('Login failed: Invalid response from server');
       }
     } catch (error) {
       console.error('Login error details:', error);
