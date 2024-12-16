@@ -67,10 +67,11 @@ router.post('/register', async (req, res) => {
 // Login
 router.post('/login', async (req, res) => {
   try {
-    console.log('Login request body:', req.body); // Debug log
+    console.log('Login attempt:', req.body); // Debug log
 
     const { email, password } = req.body;
 
+    // Validate input
     if (!email || !password) {
       return res.status(400).json({
         message: 'Email and password are required'
@@ -80,16 +81,16 @@ router.post('/login', async (req, res) => {
     // Find user
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ 
-        message: 'Invalid email or password' 
+      return res.status(401).json({
+        message: 'Invalid email or password'
       });
     }
 
     // Check password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ 
-        message: 'Invalid email or password' 
+      return res.status(401).json({
+        message: 'Invalid email or password'
       });
     }
 
@@ -99,6 +100,8 @@ router.post('/login', async (req, res) => {
       process.env.JWT_SECRET || 'your-secret-key',
       { expiresIn: '24h' }
     );
+
+    console.log('Login successful for:', email); // Debug log
 
     res.json({
       token,
@@ -110,8 +113,8 @@ router.post('/login', async (req, res) => {
     });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ 
-      message: error.message || 'Server error' 
+    res.status(500).json({
+      message: 'An error occurred during login. Please try again.'
     });
   }
 });

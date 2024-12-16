@@ -19,6 +19,31 @@ const Login = () => {
       .required('Password is required')
   });
 
+  const handleSubmit = async (values, { setSubmitting, setStatus }) => {
+    try {
+      console.log('Attempting login with:', values); // Debug log
+      
+      const response = await api.post('/auth/login', {
+        email: values.email,
+        password: values.password
+      });
+
+      console.log('Login response:', response.data); // Debug log
+
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        navigate('/');
+      } else {
+        setStatus('Login failed: No token received');
+      }
+    } catch (error) {
+      console.error('Login error details:', error);
+      setStatus(error.message || 'Login failed. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
@@ -31,18 +56,7 @@ const Login = () => {
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
-          onSubmit={async (values, { setSubmitting, setStatus }) => {
-            try {
-              const response = await api.post('/auth/login', values);
-              localStorage.setItem('token', response.data.token);
-              navigate('/');
-            } catch (error) {
-              console.error('Login error:', error);
-              setStatus(error.response?.data?.message || 'Login failed');
-            } finally {
-              setSubmitting(false);
-            }
-          }}
+          onSubmit={handleSubmit}
         >
           {({ isSubmitting, status }) => (
             <Form className="mt-8 space-y-6">
@@ -59,10 +73,13 @@ const Login = () => {
               <div className="rounded-md shadow-sm -space-y-px">
                 <div>
                   <Field
+                    id="email"
                     name="email"
                     type="email"
-                    placeholder="Email address"
+                    autoComplete="email"
+                    required
                     className="appearance-none rounded-t-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                    placeholder="Email address"
                   />
                   <ErrorMessage
                     name="email"
@@ -70,13 +87,15 @@ const Login = () => {
                     className="text-red-500 text-sm mt-1"
                   />
                 </div>
-
                 <div>
                   <Field
+                    id="password"
                     name="password"
                     type="password"
-                    placeholder="Password"
+                    autoComplete="current-password"
+                    required
                     className="appearance-none rounded-b-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                    placeholder="Password"
                   />
                   <ErrorMessage
                     name="password"
