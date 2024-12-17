@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
@@ -8,37 +8,7 @@ import api from '../services/api';
 const Profile = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const [userEvents, setUserEvents] = useState({ created: [], attending: [] });
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  useEffect(() => {
-    if (user) {
-      fetchUserData();
-    } else {
-      setLoading(false);
-    }
-  }, [user]);
-
-  const fetchUserData = async () => {
-    try {
-      const [createdRes, attendingRes] = await Promise.all([
-        api.get(`/users/${user.id}/events/created`),
-        api.get(`/users/${user.id}/events/attending`)
-      ]);
-      
-      setUserEvents({
-        created: createdRes.data || [],
-        attending: attendingRes.data || []
-      });
-      setError(null);
-    } catch (error) {
-      setError('Failed to load user events');
-      setUserEvents({ created: [], attending: [] });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const validationSchema = Yup.object({
     username: Yup.string()
@@ -77,14 +47,6 @@ const Profile = () => {
       }
     }
   };
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-      </div>
-    );
-  }
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
@@ -137,7 +99,7 @@ const Profile = () => {
 
                 <div className="border-t pt-6">
                   <h2 className="text-lg font-semibold mb-4">Change Password</h2>
-                  
+
                   <div className="space-y-4">
                     <div>
                       <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700">
@@ -196,54 +158,6 @@ const Profile = () => {
               </Form>
             )}
           </Formik>
-
-          <div className="mt-8 border-t pt-6">
-            <h2 className="text-xl font-semibold mb-4">Your Events</h2>
-            
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-lg font-medium mb-3">Events You're Hosting</h3>
-                {userEvents.created.length === 0 ? (
-                  <p className="text-gray-500">You haven't created any events yet.</p>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {userEvents.created.map(event => (
-                      <div
-                        key={event._id}
-                        className="border rounded-lg p-4 hover:shadow-md transition-shadow"
-                      >
-                        <h4 className="font-medium">{event.title}</h4>
-                        <p className="text-sm text-gray-500">
-                          {new Date(event.date).toLocaleDateString()}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <h3 className="text-lg font-medium mb-3">Events You're Attending</h3>
-                {userEvents.attending.length === 0 ? (
-                  <p className="text-gray-500">You haven't RSVP'd to any events yet.</p>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {userEvents.attending.map(event => (
-                      <div
-                        key={event._id}
-                        className="border rounded-lg p-4 hover:shadow-md transition-shadow"
-                      >
-                        <h4 className="font-medium">{event.title}</h4>
-                        <p className="text-sm text-gray-500">
-                          {new Date(event.date).toLocaleDateString()}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Home from '../pages/Home';
 import Login from '../components/Login';
 import Register from '../components/Register';
@@ -10,26 +10,29 @@ import PrivateRoute from '../components/PrivateRoute';
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/event/:id" element={<EventDetails />} />
-      <Route
-        path="/create-event"
-        element={
-          <PrivateRoute>
-            <CreateEvent />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/profile"
-        element={
-          <PrivateRoute>
-            <Profile />
-          </PrivateRoute>
-        }
-      />
+      <Route path="/" element={
+        <PrivateRoute>
+          <Home />
+        </PrivateRoute>
+      } />
+      <Route path="/event/:id" element={
+        <PrivateRoute>
+          <EventDetails />
+        </PrivateRoute>
+      } />
+      <Route path="/create-event" element={
+        <PrivateRoute>
+          <CreateEvent />
+        </PrivateRoute>
+      } />
+      <Route path="/profile" element={
+        <PrivateRoute>
+          <Profile />
+        </PrivateRoute>
+      } />
+      <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
 };
