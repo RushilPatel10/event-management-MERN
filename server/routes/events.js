@@ -132,4 +132,35 @@ router.post('/:id/rsvp', auth, async (req, res) => {
   }
 });
 
+// Get events created by user
+router.get('/users/:userId/events/created', auth, async (req, res) => {
+  try {
+    const events = await Event.find({ creator: req.params.userId })
+      .sort({ date: 'asc' })
+      .populate('creator', 'username email');
+
+    res.json(events);
+  } catch (error) {
+    console.error('Error fetching created events:', error);
+    res.status(500).json({ message: 'Error fetching created events' });
+  }
+});
+
+// Get events user is attending
+router.get('/users/:userId/events/attending', auth, async (req, res) => {
+  try {
+    const events = await Event.find({
+      'attendees.user': req.params.userId,
+      'attendees.status': 'going'
+    })
+      .sort({ date: 'asc' })
+      .populate('creator', 'username email');
+
+    res.json(events);
+  } catch (error) {
+    console.error('Error fetching attending events:', error);
+    res.status(500).json({ message: 'Error fetching attending events' });
+  }
+});
+
 module.exports = router; 

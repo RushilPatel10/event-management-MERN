@@ -13,22 +13,28 @@ const Profile = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchUserData();
-  }, []);
+    if (user) {
+      fetchUserData();
+    } else {
+      setLoading(false);
+    }
+  }, [user]);
 
   const fetchUserData = async () => {
     try {
       const [createdRes, attendingRes] = await Promise.all([
-        api.get('/events/created'),
-        api.get('/events/attending')
+        api.get(`/users/${user.id}/events/created`),
+        api.get(`/users/${user.id}/events/attending`)
       ]);
       
       setUserEvents({
-        created: createdRes.data,
-        attending: attendingRes.data
+        created: createdRes.data || [],
+        attending: attendingRes.data || []
       });
+      setError(null);
     } catch (error) {
-      setError('Failed to load user data');
+      setError('Failed to load user events');
+      setUserEvents({ created: [], attending: [] });
     } finally {
       setLoading(false);
     }

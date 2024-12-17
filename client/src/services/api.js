@@ -7,43 +7,28 @@ const api = axios.create({
   }
 });
 
-// Request interceptor
 api.interceptors.request.use(
   config => {
-    console.log('Making request to:', config.url); // Debug log
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  error => {
-    console.error('Request error:', error);
-    return Promise.reject(error);
-  }
+  error => Promise.reject(error)
 );
 
-// Response interceptor
 api.interceptors.response.use(
-  response => {
-    console.log('Received response:', response.data); // Debug log
-    return response;
-  },
+  response => response,
   error => {
-    console.error('API Error:', {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    }
+    return Promise.reject({
       status: error.response?.status,
       data: error.response?.data,
-      message: error.message
-    });
-
-    // Format error message
-    const errorMessage = error.response?.data?.message 
-      || error.message 
-      || 'An unexpected error occurred';
-
-    return Promise.reject({
-      message: errorMessage,
-      status: error.response?.status
+      message: error.response?.data?.message || 'An error occurred'
     });
   }
 );
