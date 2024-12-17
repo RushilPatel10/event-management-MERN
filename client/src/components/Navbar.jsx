@@ -19,7 +19,7 @@ const Navbar = () => {
             </Link>
           </div>
 
-          <div className="flex items-center">
+          <div className="flex items-center space-x-4">
             {user ? (
               <>
                 <Link

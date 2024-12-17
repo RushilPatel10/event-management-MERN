@@ -24,6 +24,8 @@ export const AuthProvider = ({ children }) => {
                 localStorage.removeItem('token');
                 setUser(null);
             }
+        } else {
+            setUser(null);
         }
         setLoading(false);
     };
@@ -31,7 +33,7 @@ export const AuthProvider = ({ children }) => {
     const login = async (credentials) => {
         try {
             const response = await api.post('/auth/login', credentials);
-            if (response.data.success && response.data.token) {
+            if (response.data.token) {
                 localStorage.setItem('token', response.data.token);
                 setUser(response.data.user);
                 return response.data;
@@ -44,7 +46,7 @@ export const AuthProvider = ({ children }) => {
     const register = async (userData) => {
         try {
             const response = await api.post('/auth/register', userData);
-            if (response.data.success && response.data.token) {
+            if (response.data.token) {
                 localStorage.setItem('token', response.data.token);
                 setUser(response.data.user);
                 return response.data;
@@ -59,14 +61,17 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
     };
 
+    if (loading) {
+        return <div>Loading...</div>; // Or your loading component
+    }
+
     return (
         <AuthContext.Provider value={{ 
             user, 
-            loading, 
             login, 
             register, 
             logout,
-            checkAuthStatus 
+            loading
         }}>
             {children}
         </AuthContext.Provider>
